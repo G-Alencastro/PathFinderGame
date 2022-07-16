@@ -4,33 +4,34 @@ from grafics import plot_fit_mean
 
 
 class Individual:
-    def __init__(self,genome_length=50, screen_size=(900, 600)):
-        self.genome = [randint(0, 1) for _ in range(genome_length)]
+    def __init__(self,genome_length=500, screen_size=(900, 600)):
+        self.genome = [randint(0, 3) for _ in range(genome_length)]
         self.fit = 0
         self.screen_size = screen_size
         self.pos = [10, 300]
 
     def get_fit(self, final_number):
         distance = ((self.pos[0]-final_number[0])**2 + (self.pos[1]-final_number[1])**2)**0.5
-        fit = 1/distance*10000000
+        max_dis = (final_number[0]**2 + final_number[1]**2)**0.5
+        fit = (max_dis-distance)
         self.fit = fit
         return fit
 
     def walk_a_step(self, gen, step_size=5):
         if gen == 0 and self.pos[0] < self.screen_size[0]:
             self.pos[0] += step_size
-
+            return
         if gen == 1 and self.pos[0] > 5:
             self.pos[0] -= step_size
-
+            return
         if gen == 2 and self.pos[1] < self.screen_size[1]:
             self.pos[1] += step_size
-
+            return
         if gen == 3 and self.pos[1] > 5:
             self.pos[1] -= step_size
 
 class Population:
-    def __init__(self, n_ind, genome_length=10):
+    def __init__(self, n_ind, genome_length=500):
         self.n_ind = n_ind
         self.individuals = [Individual(genome_length) for _ in range(n_ind)]
         self.mean_fit = 0
@@ -65,22 +66,15 @@ class Population:
             new_genome01 = []
             new_genome02 = []
 
-            cut_genome = randint(0, father_genome_len)
-            for g in range(father_genome_len):
-
-                if g < cut_genome == 0:
-                    new_gene = fathers[0].genome[g]
-                    new_genome01.append(new_gene)
-
-                    new_gene = fathers[1].genome[g]
-                    new_genome02.append(new_gene)
-
+            for c in range(father_genome_len):
+                decisor_num = randint(0,1)
+                if decisor_num:
+                    new_genome01.append(fathers[0].genome[c])
+                    new_genome02.append(fathers[1].genome[c])
                 else:
-                    new_gene = fathers[0].genome[g]
-                    new_genome02.append(new_gene)
+                    new_genome01.append(fathers[1].genome[c])
+                    new_genome02.append(fathers[0].genome[c])
 
-                    new_gene = fathers[1].genome[g]
-                    new_genome01.append(new_gene)
 
             new_ind01.genome = new_genome01
             new_ind02.genome = new_genome02
@@ -120,4 +114,24 @@ class Population:
 
 
 if  __name__ == '__main__':
-    pass
+    
+    def walk_a_step(gene, pos, step_size=1):
+        if gene == 0 and pos[0]:
+            pos[0] += step_size
+            return
+        if gene == 1 and pos[0]:
+            pos[0] -= step_size
+            return
+        if gene == 2 and pos[1]:
+            pos[1] += step_size
+            return
+        if gene == 3 and pos[1]:
+            pos[1] -= step_size
+
+    genome = [randint(0, 3) for _ in range(5)]
+    pos = [50, 50]
+    print(genome)
+
+    for c in range(5):
+        walk_a_step(genome[c], pos)
+        print(genome[c], pos)
