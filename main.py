@@ -11,9 +11,9 @@ class Individual:
         self.pos = [10, 300]
 
     def get_fit(self, final_number):
-        distance = ((self.pos[0]-final_number[0])**2 + (self.pos[1]-final_number[1])**2)**0.5
-        max_dis = (final_number[0]**2 + final_number[1]**2)**0.5
-        fit = (max_dis-distance)
+        distance = ((self.pos[0]-final_number[0])**2)**0.5
+        max_dis = final_number[0]
+        fit = max_dis-distance
         self.fit = fit
         return fit
 
@@ -81,7 +81,7 @@ class Population:
 
             return new_ind01, new_ind02
 
-        def mutation(ind, mut_tax=5):
+        def mutation(ind, mut_tax=1):
             for c in range(len(ind.genome)):
                 mut = randint(0, 100)
                 if mut <= mut_tax:
@@ -114,24 +114,12 @@ class Population:
 
 
 if  __name__ == '__main__':
-    
-    def walk_a_step(gene, pos, step_size=1):
-        if gene == 0 and pos[0]:
-            pos[0] += step_size
-            return
-        if gene == 1 and pos[0]:
-            pos[0] -= step_size
-            return
-        if gene == 2 and pos[1]:
-            pos[1] += step_size
-            return
-        if gene == 3 and pos[1]:
-            pos[1] -= step_size
-
-    genome = [randint(0, 3) for _ in range(5)]
-    pos = [50, 50]
-    print(genome)
-
-    for c in range(5):
-        walk_a_step(genome[c], pos)
-        print(genome[c], pos)
+    fp = [850, 300]
+    pop = Population(500)
+    gen = 0
+    for c in range(100):
+        pop.pop_walk()
+        pop.fit_pop(fp)
+        plot_fit_mean(gen, pop.mean_fit)
+        pop.new_population()
+        gen += 1
