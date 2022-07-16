@@ -3,6 +3,7 @@ from pygame.locals import *
 from main import *
 from grafics import plot_fit_mean
 import matplotlib.pyplot as plt
+from random import randint
 
 
 pygame.init()
@@ -18,6 +19,7 @@ gen = 0
 c = 0
 
 fst_ln_x, lst_ln_x = 0, 0
+fst_ln_y, lst_ln_y = 900, 0
 
 clock = pygame.time.Clock()
 while True:
@@ -29,20 +31,23 @@ while True:
             pygame.quit()
 
     pygame.draw.circle(screen, (250, 10, 10), fp, 10)
-    pygame.draw.rect(screen, (180, 190, 250), ((fst_ln_x, 0), (10, screen_size[1])))
-    pygame.draw.rect(screen, (250, 250, 90), ((lst_ln_x, 0), (10, screen_size[1])))
+    pygame.draw.rect(screen, (250, 250, 200), ((lst_ln_x, fst_ln_y), (fst_ln_x-lst_ln_x, lst_ln_y-fst_ln_y)))
 
     if c < len(pop.individuals[0].genome):
         for i in range(len(pop.individuals)):
             pop.individuals[i].walk_a_step(pop.individuals[i].genome[c])
             if gen%1 == 0:
-                pygame.draw.circle(screen, (80, 150, 50), (pop.individuals[i].pos[0], pop.individuals[i].pos[1]), 5, 2)
+                pygame.draw.circle(screen, (randint(100, 250), 100, 100), (pop.individuals[i].pos[0], pop.individuals[i].pos[1]), 5, 2)
 
         c += 1
     else:
         pop.fit_pop(fp)
         fst_ln_x = pop.individuals[0].pos[0]
         lst_ln_x = pop.individuals[-1].pos[0]
+        fst_ln_y, lst_ln_y = 850, 0
+        for ind in pop.individuals:
+            fst_ln_y = ind.pos[1] if ind.pos[1] < fst_ln_y else fst_ln_y
+            lst_ln_y = ind.pos[1] if ind.pos[1] > lst_ln_y else lst_ln_y
         pop.new_population()
         print(gen)
         gen += 1
