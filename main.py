@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, random
 import matplotlib.pyplot as plt
 from grafics import plot_fit_mean
 
@@ -11,9 +11,9 @@ class Individual:
         self.pos = [10, 300]
 
     def get_fit(self, final_number):
-        distance = ((self.pos[0]-final_number[0])**2)**0.5
-        max_dis = final_number[0]
-        fit = max_dis-distance
+        distance = ((self.pos[0]-final_number[0])**2 + (self.pos[1]-final_number[1])**2)**0.5
+        max_dis = (final_number[0]**2 + final_number[1]**2)**0.5
+        fit = (max_dis-distance)
         self.fit = fit
         return fit
 
@@ -31,7 +31,7 @@ class Individual:
             self.pos[1] -= step_size
 
 class Population:
-    def __init__(self, n_ind, genome_length=500):
+    def __init__(self, n_ind, genome_length=200):
         self.n_ind = n_ind
         self.individuals = [Individual(genome_length) for _ in range(n_ind)]
         self.mean_fit = 0
@@ -63,27 +63,19 @@ class Population:
             new_ind01 = Individual(father_genome_len)
             new_ind02 = Individual(father_genome_len)
 
-            new_genome01 = []
-            new_genome02 = []
+            cut_num = randint(0, father_genome_len)
 
-            for c in range(father_genome_len):
-                decisor_num = randint(0,1)
-                if decisor_num:
-                    new_genome01.append(fathers[0].genome[c])
-                    new_genome02.append(fathers[1].genome[c])
-                else:
-                    new_genome01.append(fathers[1].genome[c])
-                    new_genome02.append(fathers[0].genome[c])
-
+            new_genome01 = fathers[0].genome[0:cut_num]+fathers[1].genome[cut_num:father_genome_len]
+            new_genome02 = fathers[1].genome[0:cut_num]+fathers[0].genome[cut_num:father_genome_len]
 
             new_ind01.genome = new_genome01
             new_ind02.genome = new_genome02
 
             return new_ind01, new_ind02
 
-        def mutation(ind, mut_tax=1):
+        def mutation(ind, mut_tax=0.001):
             for c in range(len(ind.genome)):
-                mut = randint(0, 100)
+                mut = random()
                 if mut <= mut_tax:
                     ind.genome[c] = randint(0, 3)       
 
@@ -115,11 +107,11 @@ class Population:
 
 if  __name__ == '__main__':
     fp = [850, 300]
-    pop = Population(500)
+    pop = Population(10)
     gen = 0
-    for c in range(100):
+    for c in range(301):
         pop.pop_walk()
         pop.fit_pop(fp)
-        plot_fit_mean(gen, pop.mean_fit)
+        print(gen, pop.mean_fit)
         pop.new_population()
         gen += 1
